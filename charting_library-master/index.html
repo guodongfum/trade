@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>TradingView Charting Library demo</title>
+    <!-- Fix for iOS Safari zooming bug -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <script src="./jquery.min.js"></script>
+    <script>
+        var _w_ = {};
+        _w_.baseUrl = '${base}';
+        _w_._market = 'ethbtc'
+        // ws全局路径配置
+        _w_.wsUrl = "wss://kline.gaex.com/kline-api/ws";
+        // _w_.wsUrl = "wss://ws.chaindown.com/kline-api/ws";
+        //数据格式化，price价格小数点后位数，volume数量小数点后位数 ￥
+        _w_.ruleD = {};
+        _w_.rate = {};
+        // 顶部显示行情货币对的配置
+        _w_.toolBarInfo = 'ethbtc'
+        _w_.pre = '19'
+
+        _w_.fixRate = function (price, symbol, isF) {
+            var fixRatep = _w_.rate.lang_logo;
+            var isbreak = false;
+            var theend = ''
+            for (var a in _w_._market) {
+                if (isbreak) break;
+                for (var b = 0; b < _w_._market[a].length; b++) {
+                    if (symbol === _w_._market[a][b].key) {
+                        var key = _w_._market[a][b].name.split('/')[1].toLowerCase();
+                        var pric = _w_.rate[_w_.rate.lang][key] * price
+                        if (pric + '' !== 'NaN') {
+                            theend = isF ? ' / ' + fixRatep + pric.toFixed(2) : fixRatep + pric.toFixed(2)
+                        }
+                        isbreak = true;
+                        break;
+                    }
+                }
+            }
+            return theend
+        }
+        _w_.kiline = {
+            times: '30min',// 'line','1min','5min','15min','30min','60min','1day','1week','1month'
+            rise: '#19b34c',
+            fall: '#b33120'
+        }
+        _w_.fixD = function (num, symbol, type) {
+            //根据“_w_.ruleD”的规则对数据进行1、科学计数法计算，2、小数点后N位配置
+            // num：数据，
+            // symbol:货币对，
+            // type："price"-价格；"volume"-数量
+
+            if (num + '' === '0') { return num }
+            if (!num) { return '--' }
+            var newnum = parseFloat(num) + '';
+            if (newnum === 'NaN') { return '--' }
+            var fixNum = newnum;
+            var fNum = newnum.split('.');
+            if (_w_.ruleD[symbol]) {
+                var ruleD = _w_.ruleD[symbol][type];
+            }
+
+            // 科学计数法计算
+            if (newnum.toLowerCase().indexOf('e') > -1) {
+                var a = newnum.toLowerCase().split('e'),
+                    b = a[0],
+                    c = Math.abs(parseFloat(a[1])),
+                    d = '',
+                    h = b.length,
+                    i;
+                if (a[0].split('.')[1]) {
+                    b = a[0].split('.')[0] + a[0].split('.')[1]
+                    h = a[0].split('.')[0].length
+                }
+                for (i = 0; i < c - h; i++) {
+                    d = d + '0';
+                }
+                fixNum = '0.' + d + b;
+            } else if (ruleD >= 0 && fNum[1]) {
+                if (fNum[1].length > ruleD) {
+                    var s = parseFloat(fixNum).toFixed(ruleD + 1)
+                    fixNum = ruleD === 0 ? parseInt(s) : s.slice(0, s.length - 1)
+                } else {
+                    fixNum = parseFloat(fixNum).toFixed(ruleD);
+                }
+            }
+            return fixNum;
+        }
+        _w_.fixM = function (data, wsname) {
+            // ws建立连接后：
+            // 1、解压ArrayBuffer,并用pako解压为字符串，转换为obj;
+            // 2、数据分析，如果是ping，则直接回pong..,如果是对象，则return
+                d=false
+                ua = new Uint8Array(data);
+
+                var data = JSON.parse(pako.inflate(ua, { to: "string" }));
+                if (data["ping"]) {
+                    wsname.send(JSON.stringify({ "pong": data["ping"] }));
+                } else {
+                    d = data;
+                }
+            return d;
+        }
+        _w_.fixNumber = function (number, fix) {
+            var num = number;
+            var n = parseFloat(number)
+            if (n + '' === 'NaN') {
+                num = ''
+            } else if (n < 0) {
+                num = Math.abs(n)
+            } else if (fix === 0) {
+                num = Math.floor(n)
+            } else if (fix >= 1) {
+                var nTxt = n + ''
+                var sTxt = nTxt.indexOf('.') > -1 ? nTxt.split('.')[1] : ''
+                if (sTxt.length > fix) {
+                    num = nTxt.split('.')[0] + '.' + sTxt.slice(0, fix)
+                } else {
+                    return false
+                }
+            }
+            return num;
+        }
+    </script>
+    <script type="text/javascript" src="charting_library/charting_library.min.js"></script>
+    <!-- <script type="text/javascript" src="datafeeds/udf/dist/polyfills.js"></script>
+    <script type="text/javascript" src="datafeeds/udf/dist/bundle.js"></script> -->
+    <script src="./datafeeds/udf/datafeed.js"></script>
+    <script src="./trade_bk.js"></script>
+    <script src="./pako.min.js"></script>
+
+    <script type="text/javascript">
+
+        // function getParameterByName(name) {
+        //     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        //     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        //         results = regex.exec(location.search);
+        //     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        // }
+
+        // TradingView.onready(function () {
+            // console.log(new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"))
+            // var widget = window.tvWidget = new TradingView.widget({
+            //     // debug: false, // uncomment this line to see Library errors and warnings in the console
+            //     fullscreen: false,
+            //     symbol: 'AAPL',
+            //     interval: 'D',
+            //     volume: true,
+            //     toolbar_bg: "#DDD",
+            //     container_id: "tv_chart_container",
+            //     //	BEWARE: no trailing slash is expected in feed URL
+            //     datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"),
+            //     library_path: "charting_library/",
+            //     locale: getParameterByName('lang') || "zh",
+            //     //	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
+            //     drawings_access: { type: 'black', tools: [{ name: "Regression Trend" }] },
+            //     disabled_features: ["use_localstorage_for_settings"],
+            //     enabled_features: ["study_templates"],
+            //     charts_storage_url: 'http://saveload.tradingview.com',
+            //     charts_storage_api_version: "1.1",
+            //     client_id: 'tradingview.com',
+            //     user_id: 'public_user_id'
+            // });
+            // openTradeview()
+        // });
+        // window.onload = function () {
+        //     var ws = new WebSocket('wss://kline.gaex.com/kline-api/ws');
+        //     ws.onopen = function (evt) {
+        //         var ping = {
+        //             event:'sub',
+        //             params:{
+        //                 cb_id:'ethbtc',
+        //                 channel:'market_ethbtc_ticker'
+        //             }
+        //         }
+        //         ws.send(JSON.stringify(ping))
+        //     }
+            // ws.onmessage = function (event) {
+            //     var render = new FileReader();
+            //     render.onloadend = function () {
+            //         var ms = pako.inflate(render.result, {
+            //             to: 'string'
+            //         });
+            //         var msg = JSON.parse(ms);
+            //         if (msg.ping) {
+            //             ws.send(JSON.stringify({
+            //                 pong: msg.ping
+            //             }));
+            //         } else if (msg.tick) {
+            //             console.log(msg)
+            //         }
+            //     };
+            //     render.readAsBinaryString(event.data);
+            // }
+        // };
+    </script>
+</head>
+
+<body style="margin:0px;">
+    <!-- <div id="view"></div> -->
+    <div id="tv_chart_container"></div>
+
+</body>
+
+</html>

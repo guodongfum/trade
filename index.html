@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+</head>
+
+<body>
+	<div class="tradingView"></div>
+	<script src="./node_modules/pako/dist/pako.min.js"></script>
+	<script type="text/javascript">
+		window.onload = function () {
+			var ws = new WebSocket('wss://api.huobi.pro/ws');
+			ws.onopen = function (evt) {
+				
+				var ping = {
+					sub:"market.btcusdt.kline.1min"
+				}
+				ws.send(JSON.stringify(ping))
+			}
+			ws.onmessage = function (event) {
+				var render = new FileReader();
+				render.onloadend = function () {
+					var ms = pako.inflate(render.result, {
+						to: 'string'
+					});
+					var msg = JSON.parse(ms);
+					console.log(msg)
+					if (msg.ping) {
+						ws.send(JSON.stringify({
+							pong: msg.ping
+						}));
+					} else if (msg.tick) {
+						document.querySelector(".tradingView").innerHTML = JSON.stringify(msg.tick);
+					}
+				};
+				render.readAsBinaryString(event.data);
+			}
+		};
+	</script>
+</body>
+
+</html>

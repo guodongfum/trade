@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        echart
+    </title>
+    <script type="text/javascript" src="./echarts.min.js"></script>
+</head>
+
+<body>
+    <div id="main" style="width: 600px;height:400px;"></div>
+    <script type="text/javascript">
+    function loadK() {
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/pie', // 使用柱状图就加载bar模块，按需加载
+            ],
+            function(ec) {
+                // 基于准备好的dom，初始化echarts图表
+                myChart = ec.init(document.getElementById('container'));
+                echarts = ec;
+            }
+        );
+
+    };
+    var marketSocketUrl = "ws://47.75.175.78:18898/ws"; //websocket地址
+    marketSocket = new WebSocket(marketSocketUrl);
+    var setIntvalTime = null;
+    marketSocket.onopen = function(evt) {
+        var ping = { "sub": "market.tickers.btc" }
+        marketSocket.send(JSON.stringify(ping))
+    };
+    marketSocket.onmessage = function(evt) {
+        var render = new FileReader();
+        render.onloadend = function() {
+            var ms = pako.inflate(render.result, {
+                to: 'string'
+            });
+            var msg = JSON.parse(ms);
+            console.log(msg)
+            if (msg.ping) {
+                ws.send(JSON.stringify({
+                    pong: msg.ping
+                }));
+            } else if (msg.tick) {
+                document.querySelector(".tradingView").innerHTML = JSON.stringify(msg.tick);
+            }
+        };
+        render.readAsBinaryString(event.data);
+
+        processingData(data);
+
+    };
+    marketSocket.onerror = function(evt) {};
+    var rawData = [];
+    var CandlestickChartOption = null;
+    var CandlestickVolumeChartOption = null;
+    var newData = [];
+
+    function processingData(jsonData) {
+        var parameters = jsonData.Parameters.Data;
+        if (jsonData == null) return;
+        newData = parameters.data; //处理数据，更新数据
+        var x = 0;
+        if (dataPricesList.length != 0) {
+            for (var i = 0; i < dataPricesList.length; i++) {
+                if (dataPricesList[i].id == $("#CommodityNo").text()) {
+                    x = dataPricesList[i].prices; //获取标线的价格
+                }
+            }
+        }
+        CandlestickChartOption = setOption(newData, x);
+        myChart.setOption(CandlestickChartOption);
+        myChart.resize();
+
+    }
+    //设置数据参数（为画图做准备）
+    function setOption(rawData, x) {
+        var dates = rawData.map(function(item) {
+            return item[0];
+        });
+        var data = rawData.map(function(item) {
+            return [+item[1], +item[2], +item[5], +item[6]];
+        });
+        var option = {
+            backgroundColor: 'rgba(43, 43, 43, 0)',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'line',
+                    animation: false,
+                    lineStyle: {
+                        color: '#ffffff',
+                        width: 1,
+                        opacity: 1
+                    }
+                },
+                formatter: function(params) {
+                    var res = "时间:" + params[0].name;
+                    res += '<br/>  开盘 : ' + params[0].value[0] + '<br/>  最高 : ' + params[0].value[3];
+                    res += '<br/>  收盘 : ' + params[0].value[1] + '<br/>  最低 : ' + params[0].value[2];
+                    return res;
+                }
+            },
+            grid: {
+                x: 43,
+                y: 20,
+                x2: 46,
+                y2: 5
+            },
+            xAxis: {
+                type: 'category',
+                data: dates,
+                show: false,
+                axisLine: { lineStyle: { color: '#8392A5' } }
+            },
+            yAxis: {
+                scale: true,
+                axisLine: { lineStyle: { color: '#8392A5' } },
+                splitLine: { show: false },
+                axisTick: {
+                    show: false,
+                },
+                splitArea: {
+                    show: false
+                },
+                axisLabel: {
+                    inside: false,
+                    margin: 4
+                },
+                splitLine: {
+                    show: true,
+                    lineStyle: {
+                        color: "#8392A5"
+                    }
+                }
+            },
+            animation: false,
+            series: [{
+                type: 'candlestick',
+                name: '',
+                data: data,
+                markLine: {
+                    symbol: ['none', 'none'],
+                    clickable: false,
+                    data: [
+                        { name: '标线2起点', value: x, xAxis: "1", yAxis: x }, //持仓均线
+                        { name: '标线2终点', xAxis: "2", yAxis: x }
+                    ]
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#FD1050',
+                        color0: '#0CF49B',
+                        borderColor: '#FD1050',
+                        borderColor0: '#0CF49B'
+                    }
+                }
+            }]
+        }
+        return option;
+    };
+    </script>
+</body>
+
+</html>
+</script>
+</body>
+
+</html>
