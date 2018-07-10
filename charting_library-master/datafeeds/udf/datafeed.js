@@ -336,7 +336,7 @@ Datafeeds.UDFCompatibleDatafeed.prototype.getBars = function(symbolInfo, resolut
 	}
 
 	window.onDataCallback = onDataCallback;
-	request_data(symbolInfo, resolution, rangeStartDate, rangeEndDate)
+	// request_data(symbolInfo, resolution, rangeStartDate, rangeEndDate)
 };
 
 Datafeeds.UDFCompatibleDatafeed.prototype.subscribeBars = function(symbolInfo, resolution, onRealtimeCallback, listenerGUID, onResetCacheNeededCallback) {
