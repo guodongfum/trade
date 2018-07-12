@@ -1,0 +1,58 @@
+.chart-page .header-chart-panel .group.space-single.header-group-indicators,
+.chart-page .header-chart-panel .group.space-single.header-group-fullscreen {
+    float: none;
+}
+
+.header-chart-panel .group.space-single {
+    float: left;
+}
+
+.header-chart-panel .button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #DDD;
+}
+
+.header-chart-panel .button.textColor {
+    color: #2b89e1;
+}
+
+.button.indicators svg,
+.button.fullscreen svg {
+    fill: #DDD;
+}
+.feature-no-touch .button.indicators:hover svg{
+        fill: #68696b;
+}
+.button:not(.disabled):not(.selected):hover:before,
+.custom-select .switcher:not(.disabled):not(.selected):hover:before,
+.favored-list-container span:not(.disabled):not(.selected):hover:before,
+.submenu:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .bottom-widgetbar-content.backtesting .button:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .bottom-widgetbar-content.backtesting .custom-select .switcher:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .bottom-widgetbar-content.backtesting .favored-list-container span:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .bottom-widgetbar-content.backtesting .submenu:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .header-chart-panel .button:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .header-chart-panel .custom-select .switcher:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .header-chart-panel .favored-list-container span:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .header-chart-panel .submenu:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .properties-toolbar .button:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .properties-toolbar .custom-select .switcher:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .properties-toolbar .favored-list-container span:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .properties-toolbar .submenu:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .widgetbar-widgetheader .button:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .widgetbar-widgetheader .custom-select .switcher:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .widgetbar-widgetheader .favored-list-container span:not(.disabled):not(.selected):hover:before,
+.feature-no-touch .widgetbar-widgetheader .submenu:not(.disabled):not(.selected):hover:before {
+    border: none;
+    border-color: #f00;
+}
+
+.favored-list-container.study-template-widget {
+    display: none;
+}
+.chart-page .chart-container{
+    border:none;
+    border-top:1px solid #415480;
+}

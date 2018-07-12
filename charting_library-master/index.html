@@ -12,7 +12,10 @@
         _w_.baseUrl = '${base}';
         _w_._market = 'ethbtc'
         // ws全局路径配置
-        _w_.wsUrl = "wss://kline.gaex.com/kline-api/ws";
+        // _w_.wsUrl = "wss://kline.gaex.com/kline-api/ws";
+        _w_.wsUrl = "ws://47.75.175.78:18898/ws";
+        // _w_.wsUrl = "ws://192.168.20.141:18898/ws";
+        // _w_.wsUrl = "wss://www.huobipro.com/-/s/pro/ws"
         // _w_.wsUrl = "wss://ws.chaindown.com/kline-api/ws";
         //数据格式化，price价格小数点后位数，volume数量小数点后位数 ￥
         _w_.ruleD = {};
@@ -42,7 +45,7 @@
             return theend
         }
         _w_.kiline = {
-            times: '30min',// 'line','1min','5min','15min','30min','60min','1day','1week','1month'
+            times: '1min',// 'line','1min','5min','15min','30min','60min','1day','1week','1month'
             rise: '#19b34c',
             fall: '#b33120'
         }
@@ -96,6 +99,7 @@
                 ua = new Uint8Array(data);
 
                 var data = JSON.parse(pako.inflate(ua, { to: "string" }));
+                console.log(data)
                 if (data["ping"]) {
                     wsname.send(JSON.stringify({ "pong": data["ping"] }));
                 } else {
@@ -125,7 +129,7 @@
         }
     </script>
     <script type="text/javascript" src="charting_library/charting_library.min.js"></script>
-    <!-- <script type="text/javascript" src="datafeeds/udf/dist/polyfills.js"></script>
+<!--     <script type="text/javascript" src="datafeeds/udf/dist/polyfills.js"></script>
     <script type="text/javascript" src="datafeeds/udf/dist/bundle.js"></script> -->
     <script src="./datafeeds/udf/datafeed.js"></script>
     <script src="./trade_bk.js"></script>
@@ -133,38 +137,7 @@
 
     <script type="text/javascript">
 
-        // function getParameterByName(name) {
-        //     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        //     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        //         results = regex.exec(location.search);
-        //     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-        // }
 
-        // TradingView.onready(function () {
-        //     console.log(new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"))
-        //     var widget = window.tvWidget = new TradingView.widget({
-        //         // debug: false, // uncomment this line to see Library errors and warnings in the console
-        //         fullscreen: false,
-        //         symbol: 'AAPL',
-        //         interval: 'D',
-        //         volume: true,
-        //         toolbar_bg: "#DDD",
-        //         container_id: "tv_chart_container",
-        //         //	BEWARE: no trailing slash is expected in feed URL
-        //         datafeed: new Datafeeds.UDFCompatibleDatafeed("https://demo_feed.tradingview.com"),
-        //         library_path: "charting_library/",
-        //         locale: getParameterByName('lang') || "zh",
-        //         //	Regression Trend-related functionality is not implemented yet, so it's hidden for a while
-        //         drawings_access: { type: 'black', tools: [{ name: "Regression Trend" }] },
-        //         disabled_features: ["use_localstorage_for_settings"],
-        //         enabled_features: ["study_templates"],
-        //         charts_storage_url: 'http://saveload.tradingview.com',
-        //         charts_storage_api_version: "1.1",
-        //         client_id: 'tradingview.com',
-        //         user_id: 'public_user_id'
-        //     });
-        //     openTradeview()
-        // });
         // window.onload = function () {
         //     var ws = new WebSocket('wss://kline.gaex.com/kline-api/ws');
         //     ws.onopen = function (evt) {
@@ -196,6 +169,13 @@
             // }
         // };
     </script>
+    <style type="text/css">
+        #tv_chart_container .header-chart-panel .header-chart-panel-content .button{
+            background:none;
+            border-color:none;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="./library.css">
 </head>
 
 <body style="margin:0px;">
