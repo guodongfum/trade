@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/guodongfum/trade#readme",
   "dependencies": {
-    "jquery": "1.11.2",
+    "jquery": "3.5.0",
     "pako": "1.0.6"
   }
 }
